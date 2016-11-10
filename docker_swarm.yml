@@ -1,0 +1,178 @@
+---
+- hosts: docker-nodes
+  become: true
+  vars:
+    docker_swarm_addr: "{{ hostvars[inventory_hostname]['ansible_' + docker_swarm_interface]['ipv4']['address'] }}"
+    docker_swarm_cert_expiry: '2160h0m0s' # Validity period for node certificates (default 2160h0m0s)
+    docker_swarm_dispatcher_heartbeat_duration: '5s' # Dispatcher heartbeat period (default 5s)
+    docker_swarm_interface: "enp0s8"
+    docker_swarm_managers_ansible_group: 'docker-swarm-managers'
+    docker_swarm_networks:
+      - name: 'my_net'
+        driver: 'overlay'
+        state: 'present'
+      - name: 'test'
+        driver: 'overlay'
+        state: 'absent'
+    docker_swarm_primary_manager: '{{ groups[docker_swarm_managers_ansible_group][0] }}'
+    # docker_swarm_primary_manager: 'node0'
+    docker_swarm_task_history_limit: '5' # Task history retention limit (default 5)
+    docker_swarm_workers_ansible_group: 'docker-swarm-workers'
+    docker_swarm_port: "2377"
+  tasks:
+    - name: docker_swarm | Installing EPEL Repo (RedHat)
+      yum:
+        name: "epel-release"
+        state: "present"
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution != "Fedora"
+
+    - name: docker_swarm | Installing Pre-Reqs
+      apt:
+        name: "python-pip"
+        state: "present"
+      when: ansible_os_family == "Debian"
+
+## Installing these for future functionality
+    - name: docker_swarm | Installing Python Pre-Reqs
+      pip:
+        name: "{{ item }}"
+        state: "present"
+      with_items:
+        - 'docker-py'
+##
+
+    - name: docker_swarm | Ensuring Docker Engine Is Running
+      service:
+        name: "docker"
+        state: "started"
+
+    - name: docker_swarm | Checking Swarm Mode Status
+      command: "docker info"
+      register: "docker_info"
+      changed_when: false
+
+    - name: docker_swarm | Init Docker Swarm Mode On First Manager
+      command: >
+              docker swarm init
+              --listen-addr {{ docker_swarm_addr }}:{{ docker_swarm_port }}
+              --advertise-addr {{ docker_swarm_addr }}
+      when: >
+            'Swarm: inactive' in docker_info.stdout and
+            inventory_hostname == docker_swarm_primary_manager
+
+    - name: docker_swarm | Capturing Docker Swarm Worker join-token
+      command: "docker swarm join-token -q worker"
+      changed_when: false
+      register: "docker_swarm_worker_token"
+      when: >
+            inventory_hostname == docker_swarm_primary_manager
+
+    - name: docker_swarm | Capturing Docker Swarm Manager join-token
+      command: "docker swarm join-token -q manager"
+      changed_when: false
+      register: "docker_swarm_manager_token"
+      when: >
+            inventory_hostname == docker_swarm_primary_manager
+
+    - name: docker_swarm | Defining Docker Swarm Manager Address
+      set_fact:
+        docker_swarm_manager_address: "{{ docker_swarm_addr }}:{{ docker_swarm_port }}"
+      changed_when: false
+      when: >
+            inventory_hostname == docker_swarm_primary_manager
+
+    - name: docker_swarm | Defining Docker Swarm Manager Address
+      set_fact:
+        docker_swarm_manager_address: "{{ hostvars[docker_swarm_primary_manager]['docker_swarm_manager_address'] }}"
+      changed_when: false
+      when: >
+            inventory_hostname != docker_swarm_primary_manager
+
+    - name: docker_swarm | Defining Docker Swarm Manager join-token
+      set_fact:
+        docker_swarm_manager_token: "{{ hostvars[docker_swarm_primary_manager]['docker_swarm_manager_token'] }}"
+      changed_when: false
+      when: >
+            inventory_hostname != docker_swarm_primary_manager
+
+    - name: docker_swarm | Defining Docker Swarm Worker join-token
+      set_fact:
+        docker_swarm_worker_token: "{{ hostvars[docker_swarm_primary_manager]['docker_swarm_worker_token'] }}"
+      changed_when: false
+      when: >
+            inventory_hostname != docker_swarm_primary_manager
+
+    - name: docker_swarm | Joining Additional Docker Swarm Managers To Cluster
+      command: >
+              docker swarm join
+              --listen-addr {{ docker_swarm_addr }}:{{ docker_swarm_port }}
+              --advertise-addr {{ docker_swarm_addr }}
+              --token {{ docker_swarm_manager_token.stdout }}
+              {{ docker_swarm_manager_address }}
+      when: >
+            inventory_hostname != docker_swarm_primary_manager and
+            inventory_hostname not in groups[docker_swarm_workers_ansible_group] and
+            'Swarm: active' not in docker_info.stdout and
+            'Swarm: pending' not in docker_info.stdout
+
+    - name: docker_swarm | Joining Docker Swarm Workers To Cluster
+      command: >
+             docker swarm join
+             --listen-addr {{ docker_swarm_addr }}:{{ docker_swarm_port }}
+             --advertise-addr {{ docker_swarm_addr }}
+             --token {{ docker_swarm_worker_token.stdout }}
+             {{ docker_swarm_manager_address }}
+      when: >
+            inventory_hostname in groups[docker_swarm_workers_ansible_group] and
+            'Swarm: active' not in docker_info.stdout and
+            'Swarm: pending' not in docker_info.stdout
+
+    - name: docker_swarm | Capturing Docker Swarm Networks
+      command: "docker network ls"
+      changed_when: false
+      register: "docker_networks"
+      when: >
+            inventory_hostname == docker_swarm_primary_manager
+
+    - name: docker_swarm | Creating Docker Swarm Networks
+      command: "docker network create --driver {{ item.driver }} {{ item.name }}"
+      with_items: '{{ docker_swarm_networks }}'
+      when: >
+            inventory_hostname == docker_swarm_primary_manager and
+            item.state|lower == "present" and
+            item.name not in docker_networks.stdout
+
+    - name: docker_swarm | Removing Docker Swarm Networks
+      command: "docker network rm {{ item.name }}"
+      with_items: '{{ docker_swarm_networks }}'
+      when: >
+            inventory_hostname == docker_swarm_primary_manager and
+            item.state|lower == "absent" and
+            item.name in docker_networks.stdout
+
+## Below is for Ansible 2.2
+    # - name: docker_swarm | Managing Docker Swarm Networks
+    #   docker_network:
+    #     name: "{{ item.name }}"
+    #     driver: "{{ item.driver }}"
+    #     state: "{{ item.state }}"
+    #   with_items: '{{ docker_swarm_networks }}'
+    #   when: >
+    #         inventory_hostname == docker_swarm_primary_manager
+
+    - name: docker_swarm | Updating Docker Swarm Dispatch Heartbeat Duration
+      command: "docker swarm update --dispatcher-heartbeat {{ docker_swarm_dispatcher_heartbeat_duration }}"
+      when: >
+            inventory_hostname == docker_swarm_primary_manager
+
+    - name: docker_swarm | Updating Docker Swarm Certificate Expiry Duration
+      command: "docker swarm update --cert-expiry {{ docker_swarm_cert_expiry }}"
+      when: >
+            inventory_hostname == docker_swarm_primary_manager
+
+    - name: docker_swarm | Updating Docker Swarm Task History Limit
+      command: "docker swarm update --task-history-limit {{ docker_swarm_task_history_limit }}"
+      when: >
+            inventory_hostname == docker_swarm_primary_manager

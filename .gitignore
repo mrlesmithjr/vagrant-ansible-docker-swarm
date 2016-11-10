@@ -1,0 +1,5 @@
+.vagrant
+host_vars/
+group_vars/
+*.retry
+.galaxy_install_info
