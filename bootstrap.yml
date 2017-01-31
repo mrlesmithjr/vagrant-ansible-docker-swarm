@@ -21,6 +21,7 @@
         name: "{{ item }}"
         state: present
       with_items:
+        - build-essential
         - libffi-dev
         - libssl-dev
         - python-dev
@@ -79,7 +80,7 @@
         - python-devel
         - python-setuptools
       when: >
-            ansible_os_family == "openSUSE Leap"
+            ansible_os_family == "Suse"
 
     - name: installing python pip
       easy_install:
@@ -90,7 +91,7 @@
       pip:
         name: "ansible"
         state: present
-        version: 1.9.6
+        version: 2.2.0.0
 
     - name: ensuring host_vars directory exists
       file:

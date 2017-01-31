@@ -2,7 +2,7 @@
 - hosts: all
   become: true
   vars:
-    - pri_domain_name: 'test.vagrant.local'
+    pri_domain_name: 'test.vagrant.local'
   roles:
   tasks:
     - name: pre-reqs
@@ -31,12 +31,12 @@
         regexp: "^{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
         line: "{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
         state: present
-      with_items: groups['all']
+      with_items: '{{ groups.all }}'
 
 - hosts: docker-nodes
   become: true
   vars:
-    - pri_domain_name: 'test.vagrant.local'
+    pri_domain_name: 'test.vagrant.local'
   roles:
     - role: ansible-docker
   tasks:
@@ -48,9 +48,10 @@
         - 'redis-tools'
       when: ansible_os_family == "Debian"
 
-- hosts: prod-nodes
+- hosts: docker-nodes
   become: true
   vars:
-    - pri_domain_name: 'prod.vagrant.local'
+    pri_domain_name: 'prod.vagrant.local'
   roles:
+    - role: ansible-docker-swarm
   tasks:
