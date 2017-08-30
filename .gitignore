@@ -1,6 +1,6 @@
 .vagrant
 host_vars/
-group_vars/
+# group_vars/
 *.retry
 .galaxy_install_info
 *cloudimg-console.log
