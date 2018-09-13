@@ -1,9 +1,9 @@
 ---
-- name: 'node0'
+- name: node0
   ansible_groups:
-    - 'docker-nodes'
-    - 'docker-swarm-managers'
-  box: 'mrlesmithjr/xenial64'
+    - docker-nodes
+    - docker-swarm-managers
+  box: mrlesmithjr/xenial64
   desktop: false
   # disks:
   #   - size: 10
@@ -13,11 +13,11 @@
   interfaces:
     - ip: 192.168.250.10
       auto_config: true
-      method: 'static'
+      method: static
   #   - ip: 192.168.1.10
   #     auto_config: false
-  #     method: 'static'
-  #     network_name: 'network-1'
+  #     method: static
+  #     network_name: network-1
   mem: 512
   provision: true
   vcpu: 1
@@ -26,11 +26,11 @@
   #     host: 8080
   #   - guest: 443
   #     host: 4433
-- name: 'node1'
+- name: node1
   ansible_groups:
-    - 'docker-nodes'
-    - 'docker-swarm-managers'
-  box: 'mrlesmithjr/xenial64'
+    - docker-nodes
+    - docker-swarm-managers
+  box: mrlesmithjr/xenial64
   desktop: false
   # disks:
   #   - size: 10
@@ -40,11 +40,11 @@
   interfaces:
     - ip: 192.168.250.11
       auto_config: true
-      method: 'static'
+      method: static
   #   - ip: 192.168.1.10
   #     auto_config: false
-  #     method: 'static'
-  #     network_name: 'network-1'
+  #     method: static
+  #     network_name: network-1
   mem: 512
   provision: true
   vcpu: 1
@@ -53,11 +53,11 @@
   #     host: 8080
   #   - guest: 443
   #     host: 4433
-- name: 'node2'
+- name: node2
   ansible_groups:
-    - 'docker-nodes'
-    - 'docker-swarm-managers'
-  box: 'mrlesmithjr/xenial64'
+    - docker-nodes
+    - docker-swarm-managers
+  box: mrlesmithjr/xenial64
   desktop: false
   # disks:
   #   - size: 10
@@ -67,11 +67,11 @@
   interfaces:
     - ip: 192.168.250.12
       auto_config: true
-      method: 'static'
+      method: static
   #   - ip: 192.168.1.10
   #     auto_config: false
-  #     method: 'static'
-  #     network_name: 'network-1'
+  #     method: static
+  #     network_name: network-1
   mem: 512
   provision: true
   vcpu: 1
@@ -80,11 +80,11 @@
   #     host: 8080
   #   - guest: 443
   #     host: 4433
-- name: 'node3'
+- name: node3
   ansible_groups:
-    - 'docker-nodes'
-    - 'docker-swarm-workers'
-  box: 'mrlesmithjr/xenial64'
+    - docker-nodes
+    - docker-swarm-workers
+  box: mrlesmithjr/xenial64
   desktop: false
   # disks:
   #   - size: 10
@@ -94,11 +94,11 @@
   interfaces:
     - ip: 192.168.250.13
       auto_config: true
-      method: 'static'
+      method: static
   #   - ip: 192.168.1.10
   #     auto_config: false
-  #     method: 'static'
-  #     network_name: 'network-1'
+  #     method: static
+  #     network_name: network-1
   mem: 512
   provision: true
   vcpu: 1
@@ -107,11 +107,11 @@
   #     host: 8080
   #   - guest: 443
   #     host: 4433
-- name: 'node4'
+- name: node4
   ansible_groups:
-    - 'docker-nodes'
-    - 'docker-swarm-workers'
-  box: 'mrlesmithjr/xenial64'
+    - docker-nodes
+    - docker-swarm-workers
+  box: mrlesmithjr/xenial64
   desktop: false
   # disks:
   #   - size: 10
@@ -121,11 +121,11 @@
   interfaces:
     - ip: 192.168.250.14
       auto_config: true
-      method: 'static'
+      method: static
   #   - ip: 192.168.1.10
   #     auto_config: false
-  #     method: 'static'
-  #     network_name: 'network-1'
+  #     method: static
+  #     network_name: network-1
   mem: 512
   provision: true
   vcpu: 1
@@ -134,11 +134,11 @@
   #     host: 8080
   #   - guest: 443
   #     host: 4433
-- name: 'node5'
+- name: node5
   ansible_groups:
-    - 'docker-nodes'
-    - 'docker-swarm-workers'
-  box: 'mrlesmithjr/xenial64'
+    - docker-nodes
+    - docker-swarm-workers
+  box: mrlesmithjr/xenial64
   desktop: false
   # disks:
   #   - size: 10
@@ -148,11 +148,11 @@
   interfaces:
     - ip: 192.168.250.15
       auto_config: true
-      method: 'static'
+      method: static
   #   - ip: 192.168.1.10
   #     auto_config: false
-  #     method: 'static'
-  #     network_name: 'network-1'
+  #     method: static
+  #     network_name: network-1
   mem: 512
   provision: true
   vcpu: 1
@@ -161,11 +161,11 @@
   #     host: 8080
   #   - guest: 443
   #     host: 4433
-- name: 'node6'
+- name: node6
   ansible_groups:
-    - 'docker-nodes'
-    - 'docker-swarm-workers'
-  box: 'mrlesmithjr/xenial64'
+    - docker-nodes
+    - docker-swarm-workers
+  box: mrlesmithjr/xenial64
   desktop: false
   # disks:
   #   - size: 10
@@ -175,11 +175,11 @@
   interfaces:
     - ip: 192.168.250.16
       auto_config: true
-      method: 'static'
+      method: static
   #   - ip: 192.168.1.10
   #     auto_config: false
-  #     method: 'static'
-  #     network_name: 'network-1'
+  #     method: static
+  #     network_name: network-1
   mem: 512
   provision: true
   vcpu: 1

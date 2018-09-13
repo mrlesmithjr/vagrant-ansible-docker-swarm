@@ -19,19 +19,19 @@ Spins up a [Docker](https://www.docker.com) Swarm mode cluster within a
 
 ## Requirements
 
--   [Ansible](https://www.ansible.com)
--   [VirtualBox](https://www.virtualbox.org)
--   [Vagrant](https://www.vagrantup.com)
+- [Ansible](https://www.ansible.com)
+- [VirtualBox](https://www.virtualbox.org)
+- [Vagrant](https://www.vagrantup.com)
 
 ## Information
 
 This environment will consist of the following:
 
--   7 [Ubuntu](https://www.ubuntu.com) `16.04` nodes
-    -   3 [Docker](https://www.docker.com) Swarm Managers (node0-node2)
-    -   4 [Docker](https://www.docker.com) Swarm Workers (node3-node6)
+- 7 [Ubuntu](https://www.ubuntu.com) `16.04` nodes
+  - 3 [Docker](https://www.docker.com) Swarm Managers (node0-node2)
+  - 4 [Docker](https://www.docker.com) Swarm Workers (node3-node6)
 
-I have also included a [Python] script `docker-management.py` that will be
+I have also included a [Python script](docker-management.py) that will be
 worked on over time to do some initial various things but will have more
 functionality over time.
 
@@ -128,13 +128,12 @@ Now go and enjoy your [Docker](https://www.docker.com) Swarm mode cluster and do
 
 ## License
 
-BSD
+MIT
 
 ## Author Information
 
 Larry Smith Jr.
 
--   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
--   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
--   [mrlesmithjr](http://mrlesmithjr.com)
--   mrlesmithjr [at] gmail.com
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)
